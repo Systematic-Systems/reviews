@@ -1,0 +1,5 @@
+node_modules
+myconfig.js
+client/dist/bundle.js
+package-lock.json
+csv
