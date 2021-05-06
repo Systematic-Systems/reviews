@@ -108,7 +108,42 @@ app.get('/reviews/meta/', (req, res) => {
 });
 
 app.post('/reviews', (req, res) => {
+  const query = `INSERT INTO reviews (product_id, rating, date, body, recommend, reviewer_email, reviewer_name, summary) VALUES ('${req.body.product_id}', '${req.body.rating}', '${Date.now()}', '${req.body.body}', '${req.body.recommend}', '${req.body.email}', '${req.body.name}', '${req.body.summary}') RETURNING id AS review_id`;
+  db.query(query, (err, result) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const review_id = result.rows[0].review_id;
+      console.log('Reviews Success');
 
+      const photos = req.body.photos;
+      photos.forEach((photo) => {
+        const photoQuery = `INSERT INTO photos (review_id, url) VALUES ('${Number(review_id)}', '${photo}')`;
+        db.query(photoQuery, (err, results) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log('Photos Success');
+          }
+        });
+      });
+
+      //Iterate through characteristics
+      for (let key in req.body.characteristics) {
+        const char = req.body.characteristics[key];
+        const charQuery = `INSERT INTO characteristics (review_id, characteristic_id, value) VALUES ('${Number(review_id)}', '${char.id}', '${char.value}')`;
+        db.query(charQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Characteristics Success');
+        }
+      });
+      }
+    }
+  });
+
+  res.sendStatus(200);
 });
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
