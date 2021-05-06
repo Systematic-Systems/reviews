@@ -1,5 +1,5 @@
 LOAD CSV
-     FROM 'db/csv/reviews.csv' (
+     FROM 'db/csv/fixedReviews.csv' (
           id,
           product_id,
           rating [null if blanks],
