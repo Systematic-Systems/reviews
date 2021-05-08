@@ -10,13 +10,54 @@ app.use(express.json());
 let recent = [];
 const postReviews = (product_id) => {
   const id = product_id;
-  const searched = recent.filter((product) => {return product.id === id})
-  console.log('Searched', searched);
+  const searched = recent.map((product, index) => {
+    const item = {product: product, index: index};
+    return item;
+  }).filter((product) => Number(product.product.id) === id)
+  // console.log(searched)
+  searched.forEach((item) => {
+    recent = recent.splice(item.index-1, 1);
+  })
+  if (searched.length > 0) {
+    const reviewQuery = `SELECT reviews.review_id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness, photos.photo_id, photos.url FROM reviews FULL OUTER JOIN photos ON reviews.review_id = photos.review_id WHERE reviews.product_id = ${id}`;
+    db.query(reviewQuery, (err, results) => {
+      if (err) {
+        console.log(err);
+      }
+      // console.log(results.rows)
+      const reviews = results.rows;
+        const data = reviews.map((review) => {
+          const info = {
+            review_id: review.review_id,
+            product_id: review.product_id,
+            rating: review.rating,
+            date: review.date,
+            summary: review.summary,
+            body: review.body,
+            recommend: review.recommend,
+            reported: review.reported,
+            reviewer_name: review.reviewer_name,
+            reviewer_email: review.reviewer_email,
+            response: review.response,
+            helpfulness: review.helpfulness,
+            photos: {id: review.photo_id, url: review.url},
+          };
+            // console.log(info);
+          return info;
+        }).filter((review) => review !== null);
+        if (recent.length === 10) {
+          recent.pop();
+          recent.unshift({id: id, data: data});
+        } else {
+          recent.unshift({id: id, data: data});
+      }
+      console.log(data);
+    });
+  }
 }
 app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
   const searched = recent.filter((product) => product.id === id);
-
   if (searched.length > 0) {
     res.send(searched[0].data);
   } else {
@@ -25,7 +66,7 @@ app.get('/reviews', (req, res) => {
       if (err) {
         console.log(err);
       }
-      console.log(results.rows)
+      // console.log(results.rows)
       const reviews = results.rows;
         const data = reviews.map((review) => {
           const info = {
