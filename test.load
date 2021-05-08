@@ -1,0 +1,8 @@
+LOAD CSV
+     FROM 'db/csv/test.csv' (photo_id, review_id, url)
+     INTO postgresql:///SDC?photos(photo_id, review_id, url)
+
+     WITH
+     fields optionally enclosed by '"',
+     fields escaped by double-quote,
+     fields terminated by ',';

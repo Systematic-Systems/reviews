@@ -1,6 +1,6 @@
 LOAD CSV
      FROM 'db/csv/reviews.csv' (
-          id,
+          review_id,
           product_id,
           rating [null if blanks],
           date,
@@ -14,6 +14,7 @@ LOAD CSV
           helpfulness
           )
      INTO postgresql:///SDC?reviews (
+          review_id,
           product_id,
           rating,
           date,

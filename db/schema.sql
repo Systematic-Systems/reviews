@@ -3,7 +3,7 @@ CREATE DATABASE SDC;
 
 -- review data
 CREATE TABLE reviews (
-  id SERIAL PRIMARY KEY,
+  review_id SERIAL PRIMARY KEY,
   product_id INTEGER,
   rating INTEGER,
   date VARCHAR(500),
@@ -19,21 +19,21 @@ CREATE TABLE reviews (
 
 -- each photo connects to a single product id
 CREATE TABLE photos (
-  id SERIAL PRIMARY KEY,
+  photo_id SERIAL PRIMARY KEY,
   review_id INTEGER,
   url TEXT DEFAULT NULL
 );
 
 CREATE TABLE characteristics (
-  id SERIAL PRIMARY KEY,
+  char_id SERIAL PRIMARY KEY,
   characteristic_id INTEGER,
   review_id INTEGER,
   value INTEGER
 );
 
--- ALTER TABLE photos ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(id) ON DELETE CASCADE;
+-- ALTER TABLE photos ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(review_id) ON DELETE CASCADE;
 
--- ALTER TABLE characteristics ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(id) ON DELETE CASCADE;
+-- ALTER TABLE characteristics ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(review_id) ON DELETE CASCADE;
 
 
 -- /COPY photos FROM '/Users/CalebIuliano/hackreactor'/reviews/db/csv/reviews_photos.csv DELIMITER ',' CSV HEADER;
@@ -44,7 +44,11 @@ CREATE TABLE characteristics (
 -- \COPY reviews FROM /Users/CalebIuliano/hackreactor/reviews/db/csv/test.csv DELIMITER ',' CSV HEADER;
 
 -- Fix Serial Numbers
--- SELECT pg_catalog.setval(pg_get_serial_sequence('reviews', 'id'), MAX(id)) FROM reviews;
+-- SELECT pg_catalog.setval(pg_get_serial_sequence('reviews', 'review_id'), MAX(review_id)) FROM reviews;
+
+-- SELECT pg_catalog.setval(pg_get_serial_sequence('photos', 'photo_id'), MAX(photo_id)) FROM photos;
+
+-- SELECT pg_catalog.setval(pg_get_serial_sequence('characteristics', 'char_id'), MAX(char_id)) FROM characteristics;
 
 
 

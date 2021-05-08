@@ -1,6 +1,6 @@
 LOAD CSV
-     FROM 'db/csv/reviews_photos.csv' (id, review_id, url)
-     INTO postgresql:///SDC?photos(review_id, url)
+     FROM 'db/csv/reviews_photos.csv' (photo_id, review_id, url)
+     INTO postgresql:///SDC?photos(photo_id, review_id, url)
 
      WITH
      fields terminated by ',';
