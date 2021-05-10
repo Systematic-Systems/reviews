@@ -8,6 +8,7 @@ app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 
 let recent = [];
+
 const postReviews = (product_id) => {
   const id = product_id;
   const searched = recent.map((product, index) => {
@@ -42,7 +43,6 @@ const postReviews = (product_id) => {
             helpfulness: review.helpfulness,
             photos: {id: review.photo_id, url: review.url},
           };
-            // console.log(info);
           return info;
         }).filter((review) => review !== null);
         if (recent.length === 10) {
@@ -55,6 +55,7 @@ const postReviews = (product_id) => {
     });
   }
 }
+
 app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
   const searched = recent.filter((product) => product.id === id);
@@ -87,7 +88,7 @@ app.get('/reviews', (req, res) => {
             // console.log(info);
           return info;
         }).filter((review) => review !== null);
-        res.send(data);
+        res.status(200).send(data);
         if (recent.length === 10) {
           recent.pop();
           recent.unshift({id: id, data: data});
@@ -96,7 +97,6 @@ app.get('/reviews', (req, res) => {
       }
     });
   }
-  // res.sendStatus(200);
 });
 
 app.get('/reviews/meta/', (req, res) => {
@@ -109,7 +109,7 @@ app.get('/reviews/meta/', (req, res) => {
     const query = `SELECT reviews.review_id, rating, recommend, characteristic_id, value FROM reviews FULL OUTER JOIN characteristics ON reviews.review_id = characteristics.review_id WHERE reviews.product_id = ${id}`;
     db.query(query, (err, results) => {
       const metaResults = results.rows;
-      console.log(metaResults)
+      // console.log(metaResults)
       let reviews = {
       };
       let ratings = {
@@ -252,8 +252,10 @@ app.put('/reviews/:review_id/report', (req, res) => {
   });
 });
 
-const port = 3005;
+// const port = 3005;
 
-app.listen(port, () => {
-  console.log('listening on port', port);
-});
+// app.listen(port, () => {
+//   console.log('listening on port', port);
+// });
+
+module.exports = app;
