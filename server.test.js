@@ -1,5 +1,6 @@
 const request = require('supertest');
 const app = require('./index.js');
+const db = require('./db/db.js');
 
 app.get('/test', (req, res) => {
   res.status = 200;

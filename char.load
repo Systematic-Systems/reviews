@@ -1,6 +1,6 @@
 LOAD CSV
-     FROM 'db/csv/characteristic_reviews.csv' (char_id, characteristic_id, review_id, value)
-     INTO postgresql:///SDC?characteristics(char_id, characteristic_id, review_id, value)
+     FROM 'db/csv/characteristics.csv' (id, product_id, name)
+     INTO postgresql:///SDC?characterName(id, product_id, name)
 
      WITH
      fields optionally enclosed by '"',

@@ -31,9 +31,17 @@ CREATE TABLE characteristics (
   value INTEGER
 );
 
+CREATE TABLE characterName (
+  id SERIAL PRIMARY KEY,
+  product_id INTEGER,
+  name TEXT
+);
+
 -- ALTER TABLE photos ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(review_id) ON DELETE CASCADE;
 
 -- ALTER TABLE characteristics ADD CONSTRAINT fk_reviews FOREIGN KEY(review_id) REFERENCES reviews(review_id) ON DELETE CASCADE;
+
+-- ALTER TABLE characterName ADD CONSTRAINT fk_reviews FOREIGN KEY(product_id) REFERENCES reviews(product_id) ON DELETE CASCADE;
 
 
 -- /COPY photos FROM '/Users/CalebIuliano/hackreactor'/reviews/db/csv/reviews_photos.csv DELIMITER ',' CSV HEADER;

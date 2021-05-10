@@ -46,13 +46,12 @@ const postReviews = (product_id) => {
           };
           return info;
         }).filter((review) => review !== null);
-        if (recent.length === 10) {
+        if (recent.length === 20) {
           recent.pop();
           recent.unshift({id: id, data: data});
         } else {
           recent.unshift({id: id, data: data});
       }
-      console.log(data);
     });
   }
 }
@@ -61,7 +60,7 @@ app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
   const searched = recent.filter((product) => product.id === id);
   if (searched.length > 0) {
-    res.send(searched[0].data);
+    res.status(200).send(searched[0].data);
   } else {
     const reviewQuery = `SELECT reviews.review_id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, response, helpfulness, photos.photo_id, photos.url FROM reviews FULL OUTER JOIN photos ON reviews.review_id = photos.review_id WHERE reviews.product_id = ${id}`;
     db.query(reviewQuery, (err, results) => {
@@ -90,7 +89,7 @@ app.get('/reviews', (req, res) => {
           return info;
         });
         res.status(200).send(data);
-        if (recent.length === 10) {
+        if (recent.length === 20) {
           recent.pop();
           recent.unshift({id: id, data: data});
         } else {
@@ -105,7 +104,7 @@ app.get('/reviews/meta/', (req, res) => {
   const searched = recentMeta.filter(product => product.id === id);
 
   if (searched.length > 0) {
-    res.send(searched[0].data);
+    res.status(200).send(searched[0].data);
   } else {
     const query = `SELECT reviews.review_id, rating, recommend, characteristic_id, value FROM reviews FULL OUTER JOIN characteristics ON reviews.review_id = characteristics.review_id WHERE reviews.product_id = ${id}`;
     db.query(query, (err, results) => {
@@ -144,39 +143,54 @@ app.get('/reviews/meta/', (req, res) => {
           if (tracker[characteristic] === undefined) {
             tracker[characteristic] = {
               id: characteristic,
-              value: result.value,
+              currentValue: result.value,
               count: 1,
-              ave: result.value,
+              value: result.value,
             };
             characteristics[characteristic] = {
               id: characteristic,
-              ave: result.value,
+              value: result.value,
             };
           } else {
             tracker[characteristic].count += 1;
-            tracker[characteristic].value += 1;
-            tracker[characteristic].ave = tracker[characteristic].value / tracker[characteristic].count;
-            characteristics[characteristic].ave = tracker[characteristic].ave;
+            tracker[characteristic].currentValue += 1;
+            tracker[characteristic].value = tracker[characteristic].currentValue / tracker[characteristic].count;
+            characteristics[characteristic].value = tracker[characteristic].value.toFixed(2);
           }
         }
       });
-      const data = {
+      let data = {
         product_id: id,
         ratings: ratings,
         recommended: recommend,
         characteristics: characteristics,
       };
-      // console.log(data);
-      res.send(data);
-      if (recentMeta.length === 10) {
-        recentMeta.pop();
-        recentMeta.unshift({id: id, data: data});
-      } else {
-        recentMeta.unshift({id: id, data: data});
-      }
+
+      const charQuery = `SELECT * FROM characterName WHERE product_id = ${id}`
+      db.query(charQuery, (err, results) => {
+        if (err) {
+          console.log(err)
+        } else {
+          results.rows.forEach((row) => {
+            const charKeys = Object.keys(data.characteristics);
+            charKeys.forEach((key) => {
+              if (data.characteristics[key].id === row.id) {
+                data.characteristics[row.name] = data.characteristics[key];
+                delete data.characteristics[key];
+              }
+            })
+          })
+        }
+        res.status(200).send(data);
+        if (recentMeta.length === 20) {
+          recentMeta.pop();
+          recentMeta.unshift({id: id, data: data});
+        } else {
+          recentMeta.unshift({id: id, data: data});
+        }
+      })
     });
   }
-  // res.sendStatus(200);
 });
 
 app.post('/reviews', (req, res) => {
