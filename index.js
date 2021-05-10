@@ -8,6 +8,7 @@ app.use(express.json());
 // app.use(bodyParser.urlencoded({ extended: false }));
 
 let recent = [];
+let recentMeta = [];
 
 const postReviews = (product_id) => {
   const id = product_id;
@@ -87,7 +88,7 @@ app.get('/reviews', (req, res) => {
           };
             // console.log(info);
           return info;
-        }).filter((review) => review !== null);
+        });
         res.status(200).send(data);
         if (recent.length === 10) {
           recent.pop();
@@ -101,7 +102,7 @@ app.get('/reviews', (req, res) => {
 
 app.get('/reviews/meta/', (req, res) => {
   const id = req.query.product_id;
-  const searched = recent.filter(product => product.id === id);
+  const searched = recentMeta.filter(product => product.id === id);
 
   if (searched.length > 0) {
     res.send(searched[0].data);
@@ -167,11 +168,11 @@ app.get('/reviews/meta/', (req, res) => {
       };
       // console.log(data);
       res.send(data);
-      if (recent.length === 10) {
-        recent.pop();
-        recent.unshift({id: id, data: data});
+      if (recentMeta.length === 10) {
+        recentMeta.pop();
+        recentMeta.unshift({id: id, data: data});
       } else {
-        recent.unshift({id: id, data: data});
+        recentMeta.unshift({id: id, data: data});
       }
     });
   }
