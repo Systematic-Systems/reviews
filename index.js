@@ -63,7 +63,7 @@ app.get('/', (err, res) => {
 app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
   if (id === undefined) {
-    res.status(200).send('No Product ID');
+    res.status(200).send('Product ID Does Not Exist');
   } else {
     const searched = recent.filter((product) => product.id === id);
   if (searched.length > 0) {
@@ -110,95 +110,99 @@ app.get('/reviews', (req, res) => {
 
 app.get('/reviews/meta/', (req, res) => {
   const id = req.query.product_id;
-  const searched = recentMeta.filter(product => product.id === id);
-
-  if (searched.length > 0) {
-    res.status(200).send(searched[0].data);
+  if (id === undefined) {
+    res.status(200).send('Product ID Does Not Exist');
   } else {
-    const query = `SELECT reviews.review_id, rating, recommend, characteristic_id, value FROM reviews FULL OUTER JOIN characteristics ON reviews.review_id = characteristics.review_id WHERE reviews.product_id = ${id}`;
-    db.query(query, (err, results) => {
-      const metaResults = results.rows;
-      // console.log(metaResults)
-      let reviews = {
-      };
-      let ratings = {
-        1: 0,
-        2: 0,
-        3: 0,
-        4: 0,
-        5: 0,
-      };
-      let recommend = { true: 0, false: 0, };
-      let tracker = {
+    const searched = recentMeta.filter(product => product.id === id);
 
-      };
-      let characteristics = {
+    if (searched.length > 0) {
+      res.status(200).send(searched[0].data);
+    } else {
+      const query = `SELECT reviews.review_id, rating, recommend, characteristic_id, value FROM reviews FULL OUTER JOIN characteristics ON reviews.review_id = characteristics.review_id WHERE reviews.product_id = ${id}`;
+      db.query(query, (err, results) => {
+        const metaResults = results.rows;
+        // console.log(metaResults)
+        let reviews = {
+        };
+        let ratings = {
+          1: 0,
+          2: 0,
+          3: 0,
+          4: 0,
+          5: 0,
+        };
+        let recommend = { true: 0, false: 0, };
+        let tracker = {
 
-      };
-      metaResults.forEach((result) => {
-        const reviewID = result.review_id;
-        if (reviews[reviewID] === undefined) {
-          reviews[reviewID] = true;
-          const currentRating = result.rating;
-          ratings[currentRating] += 1;
-          if (result.recommend) {
-            recommend.true += 1;
-          } else {
-            recommend.false += 1;
+        };
+        let characteristics = {
+
+        };
+        metaResults.forEach((result) => {
+          const reviewID = result.review_id;
+          if (reviews[reviewID] === undefined) {
+            reviews[reviewID] = true;
+            const currentRating = result.rating;
+            ratings[currentRating] += 1;
+            if (result.recommend) {
+              recommend.true += 1;
+            } else {
+              recommend.false += 1;
+            }
           }
-        }
-        const characteristic = result.characteristic_id;
-        if (characteristic !== null) {
-          if (tracker[characteristic] === undefined) {
-            tracker[characteristic] = {
-              id: characteristic,
-              currentValue: result.value,
-              count: 1,
-              value: result.value,
-            };
-            characteristics[characteristic] = {
-              id: characteristic,
-              value: result.value,
-            };
-          } else {
-            tracker[characteristic].count += 1;
-            tracker[characteristic].currentValue += 1;
-            tracker[characteristic].value = tracker[characteristic].currentValue / tracker[characteristic].count;
-            characteristics[characteristic].value = tracker[characteristic].value.toFixed(2);
+          const characteristic = result.characteristic_id;
+          if (characteristic !== null) {
+            if (tracker[characteristic] === undefined) {
+              tracker[characteristic] = {
+                id: characteristic,
+                currentValue: result.value,
+                count: 1,
+                value: result.value,
+              };
+              characteristics[characteristic] = {
+                id: characteristic,
+                value: result.value,
+              };
+            } else {
+              tracker[characteristic].count += 1;
+              tracker[characteristic].currentValue += 1;
+              tracker[characteristic].value = tracker[characteristic].currentValue / tracker[characteristic].count;
+              characteristics[characteristic].value = tracker[characteristic].value.toFixed(2);
+            }
           }
-        }
-      });
-      let data = {
-        product_id: id,
-        ratings: ratings,
-        recommended: recommend,
-        characteristics: characteristics,
-      };
+        });
+        let data = {
+          product_id: id,
+          ratings: ratings,
+          recommended: recommend,
+          characteristics: characteristics,
+        };
 
-      const charQuery = `SELECT * FROM characterName WHERE product_id = ${id}`
-      db.query(charQuery, (err, results) => {
-        if (err) {
-          console.log(err)
-        } else {
-          results.rows.forEach((row) => {
-            const charKeys = Object.keys(data.characteristics);
-            charKeys.forEach((key) => {
-              if (data.characteristics[key].id === row.id) {
-                data.characteristics[row.name] = data.characteristics[key];
-                delete data.characteristics[key];
-              }
+        const charQuery = `SELECT * FROM characterName WHERE product_id = ${id}`
+        db.query(charQuery, (err, results) => {
+          if (err) {
+            console.log(err)
+          } else {
+            results.rows.forEach((row) => {
+              const charKeys = Object.keys(data.characteristics);
+              charKeys.forEach((key) => {
+                if (data.characteristics[key].id === row.id) {
+                  data.characteristics[row.name] = data.characteristics[key];
+                  delete data.characteristics[key];
+                }
+              })
             })
-          })
-        }
-        res.status(200).send(data);
-        if (recentMeta.length === 20) {
-          recentMeta.pop();
-          recentMeta.unshift({id: id, data: data});
-        } else {
-          recentMeta.unshift({id: id, data: data});
-        }
-      })
-    });
+          }
+          res.status(200).send(data);
+          if (recentMeta.length === 20) {
+            recentMeta.pop();
+            recentMeta.unshift({id: id, data: data});
+          } else {
+            recentMeta.unshift({id: id, data: data});
+          }
+        })
+      });
+    }
   }
 });
 
