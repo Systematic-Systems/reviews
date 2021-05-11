@@ -58,7 +58,10 @@ const postReviews = (product_id) => {
 
 app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
-  const searched = recent.filter((product) => product.id === id);
+  if (id === undefined) {
+    res.status(200).send('No Product ID');
+  } else {
+    const searched = recent.filter((product) => product.id === id);
   if (searched.length > 0) {
     res.status(200).send(searched[0].data);
   } else {
@@ -97,6 +100,8 @@ app.get('/reviews', (req, res) => {
       }
     });
   }
+  }
+
 });
 
 app.get('/reviews/meta/', (req, res) => {
