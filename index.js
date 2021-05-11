@@ -56,6 +56,10 @@ const postReviews = (product_id) => {
   }
 }
 
+app.get('/', (err, results) => {
+  res.status(200).send('Connected');
+})
+
 app.get('/reviews', (req, res) => {
   const id = req.query.product_id;
   if (id === undefined) {
