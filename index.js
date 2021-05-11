@@ -56,7 +56,7 @@ const postReviews = (product_id) => {
   }
 }
 
-app.get('/', (err, results) => {
+app.get('/', (err, res) => {
   res.status(200).send('Connected');
 })
 
