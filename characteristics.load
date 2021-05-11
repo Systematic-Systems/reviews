@@ -1,0 +1,8 @@
+LOAD CSV
+     FROM 'db/csv/characteristics_reviews.csv' (char_id, characteristic_id, review_id, value)
+     INTO postgresql:///SDC?characteristics(char_id, characteristic_id, review_id, value)
+
+     WITH
+     fields optionally enclosed by '"',
+     fields escaped by double-quote,
+     fields terminated by ',';
