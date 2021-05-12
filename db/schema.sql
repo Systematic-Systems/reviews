@@ -58,6 +58,8 @@ CREATE TABLE characterName (
 
 -- SELECT pg_catalog.setval(pg_get_serial_sequence('characteristics', 'char_id'), MAX(char_id)) FROM characteristics;
 
+-- SELECT pg_catalog.setval(pg_get_serial_sequence('characterName', 'id'), MAX(id)) FROM characterName;
+
 
 
 -- ALTER TABLE reviews ADD COLUMN time_holder TIMESTAMP without time zone NULL;

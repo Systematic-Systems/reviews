@@ -20,10 +20,10 @@ scenarios:
   flow:
     - get:
         url: "/reviews/?product_id={{ product }}"
-    - think: 5
 - name: "Search Meta"
   flow:
     - get:
         url: "/reviews/meta/?product_id={{ product }}"
-    - think: 5
 
+
+# artillery run artillery.yml

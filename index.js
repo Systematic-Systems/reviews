@@ -232,11 +232,19 @@ app.post('/reviews', (req, res) => {
       for (let key in req.body.characteristics) {
         const char = req.body.characteristics[key];
         const charQuery = `INSERT INTO characteristics (review_id, characteristic_id, value) VALUES ('${Number(review_id)}', '${char.id}', '${char.value}')`;
+        const nameQuery = `INSERT INTO characterName (product_id, name) VALUES ('${req.body.product_id}', '${key}')`
         db.query(charQuery, (err, result) => {
         if (err) {
           console.log(err);
         } else {
           console.log('Characteristics Success');
+        }
+      });
+      db.query(nameQuery, (err, result) => {
+        if (err) {
+          console.log(err);
+        } else {
+          console.log('Characteristics Name Success');
         }
       });
       }
